@@ -32,6 +32,7 @@ import com.example.cupcakeapp.ui.theme.OrderViewModel
 enum class CupcakeScreen(val title: String) {
     Start(title = "Cupcake App"),
     Flavor(title = "Choose Flavor"),
+    Pickup(title = "Choose Pickup Date"),
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,7 +111,24 @@ fun CupcakeApp(
                         viewModel.setFlavor(flavor)
                     },
                     onNextButtonClicked = {
-                        // TODO: Navigate to Pickup screen
+                        navController.navigate(CupcakeScreen.Pickup.name)
+                    },
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToStart(viewModel, navController)
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            composable(route = CupcakeScreen.Pickup.name) {
+                SelectOptionScreen(
+                    subtotal = uiState.price,
+                    options = uiState.pickupOptions,
+                    onSelectionChanged = { date ->
+                        viewModel.setDate(date)
+                    },
+                    onNextButtonClicked = {
+                        // TODO: Navigate to Summary screen
                     },
                     onCancelButtonClicked = {
                         cancelOrderAndNavigateToStart(viewModel, navController)
