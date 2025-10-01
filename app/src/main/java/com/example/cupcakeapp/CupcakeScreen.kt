@@ -17,6 +17,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
@@ -99,7 +100,9 @@ fun CupcakeApp() {
                 )
             }
             composable(route = CupcakeScreen.Flavor.name) {
+                val context = LocalContext.current
                 SelectOptionScreen(
+                    options = DataSource.flavors.map { id -> context.resources.getString(id) }
                 )
             }
         }
