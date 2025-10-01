@@ -27,12 +27,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.cupcakeapp.data.DataSource
 import com.example.cupcakeapp.ui.theme.StartOrderScreen
 import com.example.cupcakeapp.ui.theme.SelectOptionScreen
+import com.example.cupcakeapp.ui.theme.OrderSummaryScreen
 import com.example.cupcakeapp.ui.theme.OrderViewModel
 
 enum class CupcakeScreen(val title: String) {
     Start(title = "Cupcake App"),
     Flavor(title = "Choose Flavor"),
     Pickup(title = "Choose Pickup Date"),
+    Summary(title = "Order Summary")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,10 +130,24 @@ fun CupcakeApp(
                         viewModel.setDate(date)
                     },
                     onNextButtonClicked = {
-                        // TODO: Navigate to Summary screen
+                        navController.navigate(CupcakeScreen.Summary.name)
                     },
                     onCancelButtonClicked = {
                         cancelOrderAndNavigateToStart(viewModel, navController)
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            composable(route = CupcakeScreen.Summary.name) {
+                val context = LocalContext.current
+                OrderSummaryScreen(
+                    orderUiState = uiState,
+                    onCancelButtonClicked = {
+                        cancelOrderAndNavigateToStart(viewModel, navController)
+                    },
+                    onSendButtonClicked = { subject: String, summary: String ->
+                        shareOrder(context, subject = subject, summary = summary)
                     },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -146,4 +162,18 @@ private fun cancelOrderAndNavigateToStart(
 ) {
     viewModel.resetOrder()
     navController.popBackStack(CupcakeScreen.Start.name, inclusive = false)
+}
+
+private fun shareOrder(context: android.content.Context, subject: String, summary: String) {
+    val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(android.content.Intent.EXTRA_SUBJECT, subject)
+        putExtra(android.content.Intent.EXTRA_TEXT, summary)
+    }
+    context.startActivity(
+        android.content.Intent.createChooser(
+            intent,
+            context.getString(R.string.new_cupcake_order)
+        )
+    )
 }
